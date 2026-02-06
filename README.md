@@ -14,7 +14,7 @@ This repository serves as the **official documentation and public resource hub**
 > **This repository contains documentation, API guides, and integration demos ONLY.**
 > The Assist Pro core engine and proprietary automation logic are maintained in private infrastructure to ensure maximum security and IP protection for our users.
 
-[**Visit the Landing Page**](https://assistpro-driftsphere.vercel.app/) | [**Get Started**](https://assistpro-driftsphere.vercel.app/pricing) | [**Login**](https://assistpro-driftsphere.vercel.app/dashboard)
+[**Visit the Landing Page**](https://www.assistpro-driftsphere.com/) | [**Get Started**](https://www.assistpro-driftsphere.com/pricing) | [**Login**](https://www.assistpro-driftsphere.com/sign-in)
 
 ---
 
