@@ -20,22 +20,23 @@ This repository serves as the **official documentation and public resource hub**
 
 ## ✨ Key Features
 
-- **Email & Communication**: Automated Gmail management (Drafting, Sending, Reading).
-- **Intelligent Scheduling**: Direct integration with Google Calendar for seamless meeting management.
-- **Workflow Automation**: Connect Slack, Notion, and HubSpot to automate cross-platform tasks.
-- **Data Mastery**: Direct AI control over Google Sheets for data entry and organization.
-- **Tiered AI Credits**: Transparent credit-based execution for maximum cost efficiency.
+- **Autonomous Web & Sales Agent**: Give the AI a goal, and it will browse the web to find leads and draft personalized outreach.
+- **Voice-to-Task Execution**: Speak your instructions naturally. The AI transcribes, parses intent, and executes instantly.
+- **Digital Twin Learning**: Upload past communications and the AI learns your exact tone and writing style.
+- **RAG Active Memory**: The assistant remembers past conversations, files, and preferences, providing unparalleled context.
+- **Multi-Model Routing**: Intelligently routes low-latency tasks to Groq (Llama-3) and complex reasoning to GPT-4o or Claude 3.5.
+- **20+ Deep Integrations**: Connect seamlessly to Google Workspace, Slack, Notion, HubSpot, Zoom, Calendly, Trello, ClickUp, Zoho, Pipedrive, and Twilio (WhatsApp).
 
 ---
 
 ## 🛠️ How It Works (Conceptual)
 
-Assist Pro uses a high-performance AI orchestration layer (powered by the Linnect Engine) to parse user intent and map it to specific integration APIs.
+Assist Pro uses a high-performance AI orchestration layer to parse user intent and map it to specific integration APIs.
 
 ### The Flow:
-1. **User Input**: A natural language command is provided (e.g., *"Draft an email to the marketing team about the new lead"*).
-2. **Intent Parsing**: Assist Pro identifies the platform (Gmail), the action (Draft), and the context (Marketing Team).
-3. **Execution**: The command is executed via secure OAuth connections.
+1. **User Input**: A natural language or voice command is provided (e.g., *"Find 5 marketing leads online and draft an email to them using my style"*).
+2. **Intent Parsing & Memory Retrieval**: Assist Pro retrieves past context via RAG, identifies the necessary platforms, and plans the execution steps.
+3. **Execution**: The command is executed via secure OAuth connections and autonomous browser agents.
 4. **Verification**: Real-time notifications and task logs update the user on every action.
 
 ---
@@ -44,7 +45,9 @@ Assist Pro uses a high-performance AI orchestration layer (powered by the Linnec
 
 - [**Integration Capability Catalog**](./FEATURES.md): A detailed look at what the AI can do on each platform.
 - [**API Command Examples**](./API_EXAMPLES.md): Conceptual JSON structures and command patterns for enterprise integration.
-- [**Privacy & Security**](https://assistpro-driftsphere.vercel.app/privacy): Our commitment to data protection and encrypted storage.
+- [**Privacy Policy**](https://www.assistpro-driftsphere.com/privacy): Our commitment to data protection, encrypted storage, and our Google API Limited Use disclosure.
+- [**Terms of Service**](https://www.assistpro-driftsphere.com/terms): Usage guidelines and the human-in-the-loop AI accuracy disclaimers.
+- [**Cookie Policy**](https://www.assistpro-driftsphere.com/cookies): Full transparency on our strictly necessary cookie usage.
 
 ---
 
