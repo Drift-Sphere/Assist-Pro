@@ -1,63 +1,52 @@
 # Assist Pro 🛸💎
 
-**Intelligent AI automation for modern teams.**
-
-Assist Pro is an AI-powered productivity engine designed to reclaim human time by automating mundane workflows with precision. We integrate directly with your favorite tools (Google Workspace, Slack, Notion, HubSpot) to turn natural language instructions into concrete actions.
+**Assist Pro is an AI-powered productivity engine designed to reclaim human time by automating mundane workflows with absolute precision.** By acting as a secure "Human-in-the-Loop" orchestration layer, it integrates seamlessly with your favorite tools (Google Workspace, Slack, Notion, HubSpot, Zoom) to turn natural language instructions into concrete, trackable, and safe actions across your digital ecosystem.
 
 ---
 
-## 🚀 Overview
+## 🚀 Real Workflows in Action
 
-This repository serves as the **official documentation and public resource hub** for Assist Pro. 
+### 1. The Meeting Follow-up
+*User Prompt:* "Send a follow-up email to the team from the 10 AM sync, summarize the main points, and create a task in Notion for the Q3 roadmap."
+*Action:* AI queries Google Calendar for the 10 AM attendees, generates a customized email using your Digital Twin style, drafts the email for your approval, and automatically initializes a new page in the Notion roadmap database.
 
-> [!NOTE]
-> **This repository contains documentation, API guides, and integration demos ONLY.**
-> The Assist Pro core engine and proprietary automation logic are maintained in private infrastructure to ensure maximum security and IP protection for our users.
+### 2. The Lead Generation Pipeline
+*User Prompt:* "Find 5 software companies in Austin using the web agent, extract the CEO's contact info, and draft a personalized intro."
+*Action:* AI spins up a secure browser agent, scrapes targets, cross-references with your HubSpot CRM to prevent duplicates, adds the new contacts, and queues 5 tailored email drafts for human approval.
 
-[**Visit the Landing Page**](https://www.assistpro-driftsphere.com/) | [**Get Started**](https://www.assistpro-driftsphere.com/pricing) | [**Login**](https://www.assistpro-driftsphere.com/sign-in)
-
----
-
-## ✨ Key Features
-
-- **Autonomous Web & Sales Agent**: Give the AI a goal, and it will browse the web to find leads and draft personalized outreach.
-- **Voice-to-Task Execution**: Speak your instructions naturally. The AI transcribes, parses intent, and executes instantly.
-- **Digital Twin Learning**: Upload past communications and the AI learns your exact tone and writing style.
-- **RAG Active Memory**: The assistant remembers past conversations, files, and preferences, providing unparalleled context.
-- **Multi-Model Routing**: Intelligently routes low-latency tasks to Groq (Llama-3) and complex reasoning to GPT-4o or Claude 3.5.
-- **20+ Deep Integrations**: Connect seamlessly to Google Workspace, Slack, Notion, HubSpot, Zoom, Calendly, Trello, ClickUp, Zoho, Pipedrive, and Twilio (WhatsApp).
+### 3. The Proactive Opportunity Spotter
+*Background Trigger:* The cron engine notices an unread high-priority email from a key client and a conflicting calendar event.
+*Action:* AI flags the conflict in Slack, proposes a rescheduled time block, and drafts an apology email for your review—all before you open your laptop.
 
 ---
 
-## 🛠️ How It Works (Conceptual)
+## 🏗️ High-Level Architecture
 
-Assist Pro uses a high-performance AI orchestration layer to parse user intent and map it to specific integration APIs.
-
-### The Flow:
-1. **User Input**: A natural language or voice command is provided (e.g., *"Find 5 marketing leads online and draft an email to them using my style"*).
-2. **Intent Parsing & Memory Retrieval**: Assist Pro retrieves past context via RAG, identifies the necessary platforms, and plans the execution steps.
-3. **Execution**: The command is executed via secure OAuth connections and autonomous browser agents.
-4. **Verification**: Real-time notifications and task logs update the user on every action.
-
----
-
-## 📚 Public Resources
-
-- [**Integration Capability Catalog**](./FEATURES.md): A detailed look at what the AI can do on each platform.
-- [**API Command Examples**](./API_EXAMPLES.md): Conceptual JSON structures and command patterns for enterprise integration.
-- [**Privacy Policy**](https://www.assistpro-driftsphere.com/privacy): Our commitment to data protection, encrypted storage, and our Google API Limited Use disclosure.
-- [**Terms of Service**](https://www.assistpro-driftsphere.com/terms): Usage guidelines and the human-in-the-loop AI accuracy disclaimers.
-- [**Cookie Policy**](https://www.assistpro-driftsphere.com/cookies): Full transparency on our strictly necessary cookie usage.
+```mermaid
+graph TD
+    A[User Input / Voice / Webhook] --> B{Linnect Orchestration Engine}
+    B --> C[Memory Layer: pgvector RAG]
+    B --> D[Multi-Model Routing: Llama-3 / GPT-4o]
+    D --> E{Action Approval Gate}
+    E -->|Requires Human OK| F[Dashboard Pending Queue]
+    E -->|Safe Action| G[Tool Execution Layer]
+    F -->|Approved| G
+    G --> H[Integrations: Google, Slack, CRM]
+    G --> I[Autonomous Browser Agent]
+    H --> J[Audit Logs & Activity Feed]
+```
 
 ---
 
-## 🛡️ Security & Compliance
+## 📚 Official Documentation
 
-We take data security seriously. Assist Pro is designed with:
-- **AES-256 Encryption**: Secure storage for all workspace data.
-- **OAuth 2.0**: Direct, permission-based access to third-party tools.
-- **Merchant of Record**: All billing is processed through **Paddle** for global compliance and security.
+Explore the inner workings of Assist Pro:
 
----
+- 📖 **[Architecture Deep Dive](./docs/architecture.md)**
+- 🛡️ **[Security & Trust Center](./docs/security.md)**
+- 🔄 **[Workflow Examples](./docs/workflows/)**
+- 🔌 **[Integration Capabilities](./docs/integrations/)**
+- 💻 **[API & Webhook Examples](./examples/)**
 
-© 2026 Assist Pro / Drift Sphere. All rights reserved.
+### Links
+[**Landing Page & Demo**](https://www.assistpro-driftsphere.com/) | [**Pricing**](https://www.assistpro-driftsphere.com/pricing) | [**Login**](https://www.assistpro-driftsphere.com/sign-in)
