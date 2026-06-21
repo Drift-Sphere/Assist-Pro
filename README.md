@@ -4,6 +4,23 @@
 
 ---
 
+## 🚀 Overview
+
+This repository serves as the **official documentation and public resource hub** for Assist Pro. 
+
+> [!NOTE]
+> **This repository contains documentation, API guides, and integration demos ONLY.**
+> The Assist Pro core engine and proprietary automation logic are maintained in private infrastructure to ensure maximum security and IP protection for our users.
+
+### Product Interface
+
+*(Note to maintainers: Upload real images to `/assets/screenshots/`)*
+
+![Dashboard UI](./assets/screenshots/dashboard.png)
+![Task Approval Modal](./assets/screenshots/approval-modal.png)
+![Task Log & Execution History](./assets/screenshots/task-log.png)
+![Integration Connection Screen](./assets/screenshots/integrations.png)
+
 ## 🚀 Real Workflows in Action
 
 ### 1. The Meeting Follow-up

@@ -1,61 +1,122 @@
-# Assist Pro: API & Command Demos ⚡
+# API & Workflow Examples
 
-While our core engine is proprietary, we offer standardized patterns for enterprise organizations to integrate Assist Pro into their custom workflows.
+This document outlines real JSON payloads and task logs representing how Assist Pro plans, executes, and audits complex workflows internally.
 
 ---
 
-## 🤖 Natural Language Patterns
-
-Assist Pro is optimized for high-intent commands. Below are examples of command patterns and the resulting conceptual JSON processing.
-
-### Example 1: Lead Intake Automation
-**Command**: *"Add sarah@example.com to HubSpot as a qualified lead and notify #sales on Slack."*
-
-**Conceptual Output Pattern**:
+## 1. Single-Action Task
+**Input Command:** "Create a new spreadsheet called Q3 Marketing Budget."
+**Resolved Intent:** `CREATE_SHEET`
+**Execution Plan:**
 ```json
 {
-  "intent": "MULTI_STAGE_ORCHESTRATION",
-  "pipeline": [
-    {
-      "platform": "HUBSPOT",
-      "action": "CONTACT_CREATE",
-      "params": { "email": "sarah@example.com", "status": "QUALIFIED" }
-    },
-    {
-      "platform": "SLACK",
-      "action": "MESSAGE_SEND",
-      "params": { "channel": "#sales", "text": "New qualified lead added: sarah@example.com" }
-    }
-  ],
-  "security_mode": "STANDARD_OAUTH"
+  "steps": [
+    { "tool": "SHEETS_CREATE", "params": { "title": "Q3 Marketing Budget" } }
+  ]
 }
 ```
-
-### Example 2: Inventory Logging
-**Command**: *"Add a new row to the 'Q1 Inventory' sheet with Item: 'MacBook Pro' and Price: '$2400'."*
-
-**Conceptual Output Pattern**:
+**Final Output / Task Log:**
 ```json
 {
-  "intent": "DATA_ENTRY",
-  "platform": "GOOGLE_SHEETS",
-  "action": "ROW_ADD",
-  "params": {
-    "spreadsheet_name": "Q1 Inventory",
-    "values": ["MacBook Pro", "$2400"]
-  }
+  "status": "success",
+  "action": "SHEETS_CREATE",
+  "result": { "spreadsheetId": "1aB2c3D4...", "url": "https://docs.google.com/..." }
 }
 ```
 
 ---
 
-## 🚀 Enterprise Deployment Models
-
-For organizations requiring advanced customization (Enterprise Plan), we support:
-- **Dedicated Infrastructure**: Isolated environment for high-volume task execution.
-- **Custom Integration Mapping**: Bespoke connectors for non-standard or proprietary internal tools.
-- **Enhanced SLA Support**: Guaranteed 1h response times and dedicated success managers.
+## 2. Multi-Step Orchestration
+**Input Command:** "Find the latest email from Sarah, summarize it, and put the summary in my Slack DM."
+**Resolved Intent:** `EMAIL_TRIAGE_AND_NOTIFY`
+**Execution Plan:**
+```json
+{
+  "steps": [
+    { "step_id": 1, "tool": "GMAIL_SEARCH", "params": { "query": "from:sarah" } },
+    { "step_id": 2, "tool": "LLM_SUMMARIZE", "depends_on": [1], "params": { "text_ref": "step_1.output.body" } },
+    { "step_id": 3, "tool": "SLACK_POST_DM", "depends_on": [2], "params": { "message_ref": "step_2.output.summary" } }
+  ]
+}
+```
 
 ---
 
-[**Back to Main Documentation**](./README.md)
+## 3. Approval-Required Task
+**Input Command:** "Email the engineering team that deployment is delayed by 2 hours."
+**Resolved Intent:** `EMAIL_TEAM`
+**Execution Plan:**
+```json
+{
+  "steps": [
+    { "tool": "GMAIL_DRAFT", "params": { "to": "eng@company.com", "subject": "Deployment Delay" } },
+    { "tool": "GMAIL_SEND", "requires_approval": true, "params": { "draft_id_ref": "step_1.output.draft_id" } }
+  ]
+}
+```
+**Approval State:** Task halts at Step 2. Status set to `PENDING_APPROVAL`. Once human clicks "Approve", Step 2 executes.
+
+---
+
+## 4. Failed Task + Retry Behavior
+**Input Command:** "Add 50 rows to the reporting sheet."
+**Execution Execution:** Google Sheets API returns `429 Too Many Requests`.
+**Failure Handling:**
+```json
+{
+  "attempt": 1,
+  "status": "failed",
+  "error": "429 Rate Limit Exceeded",
+  "retry_scheduled_in_ms": 2000
+}
+```
+*(After 3 failed retries, workflow aborts, user notified via Dashboard Toast).*
+
+---
+
+## 5. Memory-Aware Drafting Task
+**Input Command:** "Draft a proposal to Acme Corp using the standard pricing tiers we discussed last week."
+**Resolved Intent:** `DRAFT_PROPOSAL`
+**Execution Plan:**
+```json
+{
+  "steps": [
+    { "tool": "MEMORY_SEARCH", "params": { "query": "Acme Corp standard pricing tiers" } },
+    { "tool": "NOTION_CREATE_PAGE", "params": { "content": "LLM_GENERATED_USING_MEMORY_CONTEXT" } }
+  ]
+}
+```
+
+---
+
+## 6. Digital Twin Drafting Task
+**Input Command:** "Reply to John and say no to his feature request."
+**Resolved Intent:** `DRAFT_REPLY`
+**Execution Plan:**
+```json
+{
+  "steps": [
+    { "tool": "FETCH_USER_STYLE_PROFILE", "params": { "user_id": "usr_123" } },
+    { "tool": "GMAIL_DRAFT", "params": { 
+        "to": "john@example.com", 
+        "instructions": "Polite rejection. Tone modifiers: [Professional, Concise, Empathetic]" 
+    }}
+  ]
+}
+```
+
+---
+
+## 7. Scheduled/Cron Proactive Task
+**Background Trigger:** Daily 8 AM Digest
+**Resolved Intent:** `MORNING_DIGEST`
+**Execution Plan:**
+```json
+{
+  "steps": [
+    { "tool": "CALENDAR_GET_TODAY", "params": {} },
+    { "tool": "GMAIL_LIST_UNREAD_HIGH_PRIORITY", "params": {} },
+    { "tool": "SLACK_POST_DM", "params": { "compiled_digest_ref": "LLM_SUMMARY_OF_1_AND_2" } }
+  ]
+}
+```

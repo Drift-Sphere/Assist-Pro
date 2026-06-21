@@ -1,21 +1,25 @@
-# Integration: HubSpot 🧡
+# Integration: HubSpot
 
-Assist Pro acts as an autonomous sales development representative (SDR) inside your HubSpot CRM.
+Turn Assist Pro into an autonomous Sales Development Representative with direct CRM access.
 
-## 🔒 Scopes & Permissions
-- `crm.objects.contacts.read` / `write`
-- `crm.objects.deals.read` / `write`
-- `crm.objects.companies.read` / `write`
+## Required OAuth Scopes
+- `crm.objects.contacts.read` & `write`
+- `crm.objects.deals.read` & `write`
+- `crm.objects.companies.read` & `write`
 
-## ⚡ Supported Actions
-- `HUBSPOT_SEARCH_CONTACT`: Find leads by name, email, or company.
-- `HUBSPOT_CREATE_CONTACT`: Insert scraped or inbound leads.
-- `HUBSPOT_UPDATE_DEAL`: Move deals across pipeline stages.
-- `HUBSPOT_ADD_NOTE`: Log call summaries or web-agent research to a contact timeline.
+## Supported Actions
+- `HUBSPOT_CREATE_CONTACT`: Add scraped leads directly to your CRM.
+- `HUBSPOT_UPDATE_LIFECYCLE_STAGE`: Move a contact from 'Lead' to 'MQL' or 'Customer'.
+- `HUBSPOT_CREATE_NOTE`: Log automated web research or meeting summaries to a contact's timeline.
+- `HUBSPOT_ATTACH_MEETING_SUMMARY`: Pin generated meeting notes to the relevant Deal record.
+- `HUBSPOT_CREATE_TASK`: Assign follow-up tasks to human sales reps.
 
-## ⚠️ Approval-Sensitive Actions
-- `HUBSPOT_UPDATE_DEAL` and any deletion actions require explicit human approval to protect pipeline integrity.
-- `HUBSPOT_CREATE_CONTACT` executes instantly.
+## What Actions Require Approval?
+- **`HUBSPOT_UPDATE_LIFECYCLE_STAGE` requires human approval** by default, to protect reporting integrity.
+- Creating notes, tasks, or initial contacts are considered "Safe Actions."
 
-## 🛑 Limitations
-- Custom objects require explicit schema mapping and may not be fully supported by the default AI orchestrator without custom instructions.
+## Known Limitations
+- Custom Object manipulation is not supported out-of-the-box and requires specific schema mapping via custom prompts.
+
+## Rate-Limit or Quota Considerations
+- Complies with HubSpot's 10-second and daily API request limits. Bulk contact imports via the AI agent are throttled to 50 contacts per batch.

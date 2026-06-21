@@ -1,20 +1,26 @@
-# Integration: Slack 💬
+# Integration: Slack
 
-Assist Pro connects to your Slack workspace to provide notifications, summaries, and automated team updates.
+Assist Pro uses Slack as both an output channel for summaries and an input trigger for chat-based automation.
 
-## 🔒 Scopes & Permissions
-- `chat:write`: Send messages as the Assist Pro bot.
-- `channels:read`: List public channels to map automation targets.
-- `im:write`: Send direct messages.
+## Required OAuth Scopes
+- `chat:write`: Send messages to channels and DMs.
+- `channels:read`: Map public channel IDs.
+- `im:write`: Direct message functionality.
+- `app_mentions:read`: (Optional) Allows triggering Assist Pro by @-mentioning it in Slack.
 
-## ⚡ Supported Actions
-- `SLACK_POST_CHANNEL`: Send a formatted message to a specific channel.
-- `SLACK_POST_DM`: Send a direct message to a user.
-- `SLACK_LIST_CHANNELS`: Retrieve available channels for workflow planning.
+## Supported Actions
+- `SLACK_SEND_DM`: DM the authorizing user with alerts, digests, or pending approval requests.
+- `SLACK_POST_CHANNEL_MESSAGE`: Broadcast summaries, lead updates, or alerts to a designated team channel.
+- `SLACK_SUMMARIZE_THREAD`: Read a long thread and output a bulleted summary.
+- `SLACK_CREATE_REMINDER`: Use Slack's native reminder system.
 
-## ⚠️ Approval-Sensitive Actions
-- `SLACK_POST_CHANNEL` (to public/team channels) requires human approval by default to prevent AI hallucinations from broadcasting to the entire company.
-- `SLACK_POST_DM` (to yourself) executes instantly.
+## What Actions Require Approval?
+- **`SLACK_POST_CHANNEL_MESSAGE` requires human approval** to prevent AI from accidentally hallucinating into a public company channel.
+- `SLACK_SEND_DM` (to yourself) is a "Safe Action."
 
-## 🎣 Webhook Events (Incoming)
-Assist Pro can listen for Slack events (e.g., app mentions) if configured via the Universal Webhook Connector, allowing users to trigger AI tasks directly from Slack chat.
+## Known Limitations
+- Assist Pro cannot read private channels it has not been explicitly invited to.
+- It cannot read DMs between other users.
+
+## Rate-Limit or Quota Considerations
+- Slack API limits `chat.postMessage` to 1 message per second per channel. The Orchestrator will queue bursts of notifications to prevent `429` errors.

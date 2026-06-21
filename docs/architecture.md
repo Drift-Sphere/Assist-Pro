@@ -1,38 +1,46 @@
-# Assist Pro: Architecture 🏗️
+# Assist Pro System Architecture
 
-This document details the layered architecture that makes Assist Pro intelligent, safe, and highly integrated.
+This document breaks down the end-to-end technical architecture of Assist Pro, detailing how user intent is securely translated into autonomous actions across the 6 core layers of our system.
 
----
+## 1. Input Layer
+Assist Pro can ingest commands through multiple vectors:
+- **Text Input**: Direct command input via the dashboard chat UI.
+- **Voice Input**: Audio streams processed through OpenAI Whisper or Groq Whisper for highly accurate STT (Speech-to-Text).
+- **Uploaded Docs/Context**: Users can upload PDFs, CSVs, or text files to provide temporary context for a single workflow.
+- **Webhooks/Events**: Incoming triggers from scheduled cron jobs (e.g., "Daily Digest") or external webhooks (e.g., "New HubSpot Lead").
 
-## 1. Orchestration Layer (The "Linnect Engine")
-The orchestrator is the central brain of Assist Pro. When a prompt, webhook, or cron job triggers the system, the orchestrator:
-1. **Parses Intent**: Identifies the goal, required tools, and required constraints.
-2. **Plans the Chain**: Breaks complex requests ("Find leads and email them") into a sequence of atomic actions.
-3. **Validates Permissions**: Ensures the user has the required connected integrations and scopes to perform the planned actions.
+## 2. Intent & Planner Layer
+The Orchestrator acts as the "brain" of the system.
+- **Command Classification**: We use ultra-fast, deterministic models (Llama-3 on Groq) to instantly classify the incoming prompt. Is this a query? A multi-step action? An API failure retry?
+- **Tool Selection**: The planner maps the extracted intent to available integration tools (e.g., mapping "Email David" to `GMAIL_SEND`).
+- **Execution Planning**: For complex commands, a DAG (Directed Acyclic Graph) of actions is generated.
+- **Safety Rules / Approval Routing**: The orchestrator checks every planned action against hardcoded safety rules. If an action is high-risk (e.g., `GMAIL_SEND`), the planner tags it with `requires_approval: true`.
 
-## 2. Multi-Model Routing Layer
-We do not rely on a single monolithic LLM. Task complexity dictates model selection:
-- **Groq (Llama-3)**: Handles intent parsing, data extraction, and fast, deterministic classifications in milliseconds.
-- **GPT-4o & Claude 3.5 Sonnet**: Used for complex reasoning, multi-step web browsing logic, and high-fidelity drafting (Digital Twin emulation).
+## 3. Memory Layer
+Our RAG (Retrieval-Augmented Generation) infrastructure ensures the AI has deep context.
+- **What gets stored**: User preferences, past tool execution results, and interaction summaries.
+- **Vector Memory**: Contextual data is embedded (Google Gemini Embeddings) and stored in PostgreSQL using `pgvector`.
+- **Short-term vs Long-term**:
+  - *Short-term (Session)*: Stored in Redis. Handles active multi-step workflows and conversational history for the current login session.
+  - *Long-term*: Stored in `pgvector`. Persists across sessions.
+- **Digital Twin Training Data**: When a user opts-in to style learning, we extract linguistic markers (tone, syntax) into a mathematical profile (`UserStyleProfile`). Raw emails are **not** kept for training; only the abstract profile is stored and injected into drafting prompts.
 
-## 3. Memory Layer (RAG & Knowledge Graph)
-- **Vector Storage**: We use PostgreSQL with `pgvector`.
-- **Embeddings**: Google Gemini Embeddings.
-- **Context Injection**: Before any action is taken, the system queries the memory layer. If you refer to "that project proposal from last week", the memory layer pulls the relevant vector and injects it into the prompt context so the AI understands exactly what you mean.
+## 4. Action Layer
+The executor layer handles the actual API calls via secure, typed integrations.
+- **Gmail Actions**: `GMAIL_READ`, `GMAIL_DRAFT`, `GMAIL_SEND`
+- **Slack Actions**: `SLACK_POST_CHANNEL`, `SLACK_POST_DM`, `SLACK_LIST_CHANNELS`
+- **HubSpot Actions**: `HUBSPOT_SEARCH`, `HUBSPOT_CREATE`, `HUBSPOT_UPDATE`
+- **Notion Actions**: `NOTION_CREATE_PAGE`, `NOTION_UPDATE_PAGE`
+- **Browser Agent Actions**: Utilizes `Stagehand` (Playwright-based) to navigate the DOM, extract unstructured data, and submit forms on platforms lacking standard APIs.
 
-## 4. Tool Execution & Integration Layer
-Assist Pro communicates with external APIs via secure, typed executor functions. 
-- **Atomic Actions**: Every integration has specific actions (e.g., `GMAIL_SEND`, `SLACK_POST`, `NOTION_CREATE_PAGE`).
-- **Data Standardization**: The execution layer normalizes outputs from various APIs into a standard JSON format that the AI can easily read to inform its next step.
+## 5. Audit & Notification Layer
+Total visibility into AI actions is critical for trust.
+- **Task Logs**: Every planned and executed action is logged immutably. The log contains the exact JSON payload sent to the third-party API and the exact response received.
+- **Notifications**: Users receive real-time UI toasts, Slack pings, or SMS alerts (via Twilio) when a high-risk task is pending approval or when a long-running workflow completes.
+- **Failure Handling & Retries**: If an API request fails (e.g., 503 Server Error), the executor logs the failure, attempts an exponential backoff retry (up to 3 times), and if it still fails, aborts the remaining workflow steps to prevent cascading errors. Rollback rules apply to local database state (e.g., removing a pending task record).
 
-## 5. Security Boundaries & Authorization
-- **Local Resource Tracking**: If the AI creates a Google Sheet or you manually pick one, it is logged in our `AuthorizedResource` table. **The AI cannot read or write to any resource ID not present in this local table**, even if the OAuth token technically has permission.
-- **Scope Minimization**: We request `drive.file` instead of `drive.readonly` or full `drive`.
-
-## 6. The "Human-in-the-Loop" Approval Model
-Safety is paramount. The system categorizes actions into two buckets:
-1. **Safe Actions** (e.g., Read my calendar, draft a note, summarize a thread). These execute instantly.
-2. **High-Risk Actions** (e.g., Send an email, delete a contact, execute a financial transaction, post to a public Slack channel). 
-
-**How Approval Works:**
-When the orchestrator plans a high-risk action, it halts execution. It serializes the exact API payload it *intends* to send and places it in a "Pending" queue. The user reviews the drafted email or CRM payload in the dashboard. Upon clicking "Approve", the orchestrator simply fires the pre-calculated payload. The AI cannot "hallucinate" an approval bypass.
+## 6. Security Layer
+- **OAuth Token Handling**: We use Clerk for primary auth. Integration OAuth tokens are encrypted at the application level before being written to PostgreSQL.
+- **Encryption**: AES-256 encryption at rest for all database volumes.
+- **Tenant Isolation**: PostgreSQL Row-Level Security (RLS) ensures that one workspace can never query or execute tools using another workspace's tokens.
+- **Permission Scopes**: We practice strict scope minimization. For example, Google Workspace integration requests `drive.file` (only files created by the app or explicitly selected) rather than full `drive` access.
